@@ -5,16 +5,74 @@
 #include <bitset>
 #include "cstdint"
 
+/**
+ * A class representing a single position of a 3x3 tic-tac-toe board.
+ *
+ * The board is represented as two 9-bit numbers, which each fit into a 16-bit unsigned integer:
+ *  (1) The position - "on" bits denote the cells occupied by the current player.
+ *  (2) The mask - "on" bits denote all occupied cells, regardless of player.
+ *
+ * Then, it is as simple as using a bitwise XOR operator to obtain the position of the opponent.
+ * The position can also be quickly tested for a win or loss using bitmasks of the
+ * 8 possible winning sequences (3 rows + 3 columns + 2 diagonals).
+ *
+ * The binary number is constructed in the following sequence:
+ *  8 7 6
+ *  5 4 3    ->    8 7 6 5 4 3 2 1.
+ *  2 1 0
+ *
+ * For example, consider this tic-tac-toe board:
+ *                         Opponent's
+ *  Board     Position     Position       Mask
+ *  - - X      0 0 1        0 0 0         0 0 1
+ *  X O -      1 0 0    +   0 1 0    =    1 1 0
+ *  - - O      0 0 0        0 0 1         0 0 1
+ *
+ * The unique position identifier is obtained by adding the position and the mask.
+ * Since the result is stored in a 16-bit unsigned integer,
+ * it will not overflow given the nature of the game.
+ *
+ */
 class Position {
 public:
   using position_t = uint16_t;
 
   Position() : position(0), mask(0), total_moves(0) {};
 
+  /**
+   * Computes the unique key identifying the current position.
+   *
+   * @return a position key.
+   */
+  [[nodiscard]] position_t key() const {
+    return position + mask;
+  }
+
+  /**
+   * Gets the number of moves played up to the current position.
+   *
+   * @return the number of moves played.
+   */
+  [[nodiscard]] int num_moves() const {
+    return total_moves;
+  }
+
+  /**
+   * Determines whether the current position is winning.
+   * The assessment is from the perspective of the player to move in the current position.
+   *
+   * @return a boolean of whether the current position is winning.
+   */
   [[nodiscard]] bool winning() const {
     return check_winning(position);
   }
 
+ /**
+  * Determines whether the current position is losing (i.e. the opponent is winning).
+  * The assessment is from the perspective of the player to move in the current position.
+  *
+  * @return a boolean of whether the current position is losing.
+  */
   [[nodiscard]] bool opp_winning() const {
     return check_winning(position ^ mask);
   }
@@ -34,7 +92,7 @@ public:
    * However, in the function below, m is assumed to be 1,
    * as the perspective will be determined by the agent.
    */
-  [[nodiscard]] int score() const {
+  [[nodiscard]] uint8_t score() const {
     return (11 - total_moves) / 2;
   }
 
@@ -86,7 +144,7 @@ public:
    *
    * @return a bitmap where "on" bits are free cells.
    */
-  position_t possible_moves() const {
+  [[nodiscard]] position_t possible_moves() const {
     return ~mask;
   };
 
@@ -127,6 +185,7 @@ public:
   // Since the minimum number of turns to win is 5, the maximum score is (9 - 5 + 2) / 2 = 3.
   // See the public function `score` for more details of how this is calculated.
   static constexpr int MAX_SCORE = 3;
+  static constexpr int MIN_SCORE = -3;
 
 private:
   position_t position;
@@ -134,6 +193,10 @@ private:
   int total_moves;
 
   static constexpr position_t first_cell_mask = UINT16_C(1) << 8;
+
+  /**
+   * The bitmasks of the 8 possible winning combinations on a 3x3 tic-tac-toe board.
+   */
   static constexpr position_t winning_lines[8]{
     0b111000000,
     0b000111000,

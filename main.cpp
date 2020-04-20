@@ -1,28 +1,19 @@
-#include <iostream>
-#include <chrono>
-#include "Position.h"
-#include "Agent.h"
+#include "Benchmark.h"
+#include "RandomAgent.h"
+#include "ManualAgent.h"
+#include "PerfectAgent.h"
 
 int main(int argc, char **argv) {
-  Position P;
-  P.display();
+  Benchmark B;
 
-  Agent A;
+  auto A1 = new PerfectAgent{};
+  auto A2 = new PerfectAgent{};
 
-  int score;
-  int trials = 200;
+//  B.match(A1, A2);
+  B.benchmark(A1, 10000);
 
-  auto start_time = std::chrono::high_resolution_clock::now();
-
-  for (int i = 0; i < trials; ++i) {
-    score = A.evaluate(P);
-  }
-
-  auto end_time = std::chrono::high_resolution_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-
-  std::cout << "Score: " << score << " Nodes visited: " << A.num_visited() / trials
-            << " Time: " << duration.count() / trials << " ms" << std::endl;
+  delete A1;
+  delete A2;
 
   return 0;
 }
