@@ -4,13 +4,11 @@
 #include "PerfectAgent.h"
 
 int main(int argc, char **argv) {
-  Benchmark B;
-
   auto A1 = new PerfectAgent{};
   auto A2 = new PerfectAgent{};
 
-//  B.match(A1, A2);
-  B.benchmark(A1, 10000);
+//Benchmark::match(A1, A2);
+  Benchmark::benchmark(A1, 10000);
 
   delete A1;
   delete A2;

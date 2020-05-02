@@ -8,15 +8,13 @@
 
 class Benchmark {
 public:
-  Benchmark() = default;
-
   /**
    * Benchmarks the speed of an agent by running many trials.
    *
    * @param A The agent to test.
    * @param trials The number of trials to run.
    */
-  void benchmark(Agent *A, unsigned int trials) {
+  static const void benchmark(Agent *A, unsigned int trials) {
     // Use an empty board for testing.
     Position P;
 
@@ -46,8 +44,8 @@ public:
    * @param A1 The agent to play first.
    * @param A2 The agent to play second.
    */
-  void match(Agent *A1, Agent *A2) {
-    Agent *agents[2] {A1, A2};
+  static const void match(Agent *A1, Agent *A2) {
+    Agent *agents[2]{A1, A2};
     Position P;
     P.display();
     std::cout << std::endl;

@@ -2,7 +2,6 @@
 
 Position::position_t PerfectAgent::play(Position &P) {
   const Position::position_t possible_moves = P.possible_moves();
-
   Position::position_t best_move;
 
   /**
@@ -18,7 +17,7 @@ Position::position_t PerfectAgent::play(Position &P) {
 
     P.play(move);
 
-    int score = -negamax(P, -Position::MAX_SCORE, -alpha);
+    int score = -negamax(P, Position::MIN_SCORE, -alpha);
 
     P.undo(move);
 
@@ -32,7 +31,7 @@ Position::position_t PerfectAgent::play(Position &P) {
 }
 
 int PerfectAgent::evaluate(Position &P) {
-  return negamax(P, -Position::MAX_SCORE, Position::MAX_SCORE);
+  return negamax(P, Position::MIN_SCORE, Position::MAX_SCORE);
 }
 
 int PerfectAgent::negamax(Position &P, int alpha, int beta) {
@@ -61,6 +60,7 @@ int PerfectAgent::negamax(Position &P, int alpha, int beta) {
   if (P.opp_winning()) {
     return -P.score();
   }
+  // If the position is not a win or loss but is full, then it must be a draw.
   if (P.full()) {
     return 0;
   }
